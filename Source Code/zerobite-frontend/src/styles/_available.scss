@@ -1,0 +1,281 @@
+// src/styles/_available.scss
+// Sketch-style available-donations grid (compact, high contrast)
+
+/* Local variables (component-local) */
+$accent: #0a84ff;
+$card-bg-dark-start: rgba(30,30,30,0.98);
+$card-bg-dark-end: rgba(12,12,12,0.98);
+$card-bg-dark: linear-gradient(180deg, $card-bg-dark-start, $card-bg-dark-end);
+$text-color: #e8e8e8;
+$muted-color: rgba(255,255,255,0.75);
+$card-radius: 16px;
+$card-border: rgba(255,255,255,0.06);
+
+/* ---------- Grid layout ---------- */
+.donations-grid.sketch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  align-items: stretch; /* ensure cards align same height */
+  margin: 18px 0;
+  padding: 6px;
+  justify-content: center;
+}
+
+/* responsive adjustments */
+@media (max-width: 1100px) {
+  .donations-grid.sketch-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+}
+@media (max-width: 680px) {
+  .donations-grid.sketch-grid { grid-template-columns: 1fr; gap: 14px; }
+}
+
+/* ---------- Card ---------- */
+.donation-card.sketch-card {
+  background: $card-bg-dark;
+  border-radius: $card-radius;
+  padding: 14px;
+  min-height: 320px;           /* uniform card height */
+  width: 100%;                 /* let grid control width */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;        /* stretch children full width */
+  justify-content: flex-start;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+  border: 1px solid $card-border;
+  transition: transform .12s ease, box-shadow .12s ease;
+  color: $text-color;
+  box-sizing: border-box;
+}
+.donation-card.sketch-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 46px rgba(0,0,0,0.65);
+}
+
+/* keyboard focus state for accessibility */
+.donation-card.sketch-card:focus-within,
+.donation-card.sketch-card:focus {
+  outline: 3px solid rgba(10,132,255,0.12);
+  outline-offset: 4px;
+}
+
+/* ---------- Thumbnail ---------- */
+.donation-thumb.sketch-thumb {
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0b0b0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.donation-thumb.sketch-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* fallback when image missing */
+.donation-thumb.sketch-thumb.empty {
+  background: linear-gradient(180deg, rgba(10,10,10,0.7), rgba(8,8,8,0.65));
+  color: rgba(255,255,255,0.32);
+  font-size: 0.92rem;
+}
+
+/* ---------- Body / Text ---------- */
+.donation-body.sketch-body {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  flex: 1 1 auto; /* fill vertical space so actions stick to bottom */
+  min-width: 0;
+}
+
+/* Title */
+.donation-title {
+  font-size: 1.02rem;
+  margin: 0;
+  color: #fff;
+  line-height: 1.12;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* description: clamp to 2 lines */
+.donation-desc-line {
+  color: rgba(255,255,255,0.88);
+  font-size: 0.92rem;
+  margin-top: 4px;
+  min-height: 1.2em;
+  max-height: 2.6em;
+  overflow: hidden;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-height: 1.2;
+}
+.donation-desc-line p { margin: 0; }
+
+/* metadata */
+.donation-meta-line {
+  color: $muted-color;
+  font-size: 0.88rem;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.donation-quantity {
+  background: rgba(10,132,255,0.08);
+  color: $accent;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.87rem;
+  min-width: 44px;
+  text-align: center;
+}
+
+/* optional icon next to meta text */
+.donation-meta-line .meta-icon {
+  opacity: 0.88;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ---------- Actions (centered and aligned at same vertical position) ---------- */
+/* push actions to the bottom of the card body so every card has buttons at identical vertical placement */
+.sketch-actions {
+  margin-top: auto;            /* push to bottom */
+  display: flex;
+  justify-content: center;    /* center horizontally (per your request) */
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;          /* prevent wrapping onto next line */
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: 6px;
+}
+
+/* small action button variant (used for Show map / Place order) */
+.btn.small {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.96rem;
+  background: $accent;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;           /* consistent button width so pairs line up */
+  box-shadow: 0 8px 20px rgba(10,132,255,0.08);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.btn.small:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(10,132,255,0.12); }
+.btn.small:active { transform: translateY(0); box-shadow: 0 6px 14px rgba(10,132,255,0.08); }
+.btn.small[disabled] { opacity: 0.8; cursor: not-allowed; }
+
+/* If you need a slightly smaller secondary action, keep the same height */
+.btn.small.secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: $text-color;
+  min-width: 120px;
+}
+
+/* claimed / expired tags */
+.tag {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.tag.claimed { background: rgba(45,200,120,0.12); color: #2dc878; }
+.tag.expired { background: rgba(255,150,0,0.08); color: #ff9800; }
+
+/* ---------- Small-screen tweaks ---------- */
+@media (max-width: 560px) {
+  /* On narrow screens, allow the buttons to stack and shrink widths so layout remains usable */
+  .sketch-actions {
+    gap: 8px;
+    padding-top: 10px;
+  }
+  .btn.small { min-width: 96px; padding: 7px 10px; font-size: 0.9rem; }
+}
+
+/* countdown badge */
+.countdown {
+  background: rgba(255,255,255,0.04);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  color: #ffd880;
+}
+
+/* Sidebar styles grouped and namespaced */
+.available-side {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100%;
+  background: rgba(20, 20, 20, 0.96);
+  backdrop-filter: blur(14px);
+  box-shadow: -4px 0 14px rgba(0, 0, 0, 0.35);
+  transform: translateX(100%);
+  transition: transform 0.3s ease-in-out;
+  padding: 1.4rem;
+  overflow-y: auto;
+  z-index: 1400;
+  color: #f1f1f1;
+
+  &.visible { transform: translateX(0); }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    float: right;
+    cursor: pointer;
+    color: #f1f1f1;
+    transition: transform 0.2s, color 0.2s;
+    &:hover { transform: rotate(90deg); color: $accent; }
+  }
+
+  .side-title {
+    font-size: 1.4rem;
+    margin: 0.8rem 0 1.4rem;
+    font-weight: 700;
+    color: $accent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding-bottom: 0.6rem;
+  }
+
+  .status { margin: 1rem 0; font-size: 0.95rem; text-align: center;
+    &.error { color: #ff6b6b; font-weight: 600; }
+  }
+
+  .donation-list { display: flex; flex-direction: column; gap: 1.8rem; padding-bottom: 1rem; }
+
+  .donation-card { background: linear-gradient(180deg, rgba(32,32,32,0.95), rgba(18,18,18,0.95)); }
+}
+

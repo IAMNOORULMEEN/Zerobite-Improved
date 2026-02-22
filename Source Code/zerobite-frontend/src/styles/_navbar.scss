@@ -1,0 +1,157 @@
+.navbar {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%); /* centered navbar */
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center the pill */
+  width: auto;
+  pointer-events: auto;
+
+  .brand {
+    position: absolute;
+    left: 2rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4a90e2;
+    font-family: "Poppins", sans-serif;
+    letter-spacing: 0.6px;
+  }
+
+  .nav-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.5rem 1.25rem;
+
+    /* Transparent pill style */
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255,255,255,0.03));
+    backdrop-filter: blur(12px);
+    border-radius: 50px; /* pill shape */
+    border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 6px 24px rgba(2,6,23,0.25);
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 1.25rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+
+    li {
+      a {
+        text-decoration: none;
+        font-weight: 500;
+        color: #f5f5f5;
+        font-family: "Poppins", sans-serif;
+        transition: 0.18s;
+
+        &:hover {
+          color: #4a90e2; /* contrast hover */
+        }
+
+        &.active {
+          font-weight: 600;
+          color: #4a90e2;
+        }
+      }
+    }
+  }
+
+  .login-btn {
+    background: #4a90e2;
+    border: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 20px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.92rem;
+    transition: background 0.18s, transform 0.12s;
+
+    &:hover {
+      background: #357ab8;
+      transform: translateY(-2px);
+    }
+  }
+
+  .profile-section {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .profile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.04);
+  }
+
+  .profile-username {
+    font-weight: 700;
+    font-size: 0.94rem;
+    color: #fff;
+  }
+
+  @media (max-width: 760px) {
+    .nav-container {
+      gap: 0.75rem;
+      padding: 0.45rem 0.9rem;
+    }
+    .nav-links { gap: 0.9rem; }
+    .brand { left: 1rem; font-size: 1.1rem; }
+  }
+}
+
+/* reward badge on top-right of avatar */
+.profile-section { position: relative; display:flex; align-items:center; gap:10px; }
+
+.profile-avatar {
+  width: 40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.06);
+}
+
+/* badge circle */
+.avatar-badge {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(90deg,#ffd25b,#ff8a00);
+  display:flex; align-items:center; justify-content:center;
+  color:#111; font-weight:700; font-size:0.7rem;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  transform-origin: center;
+  animation: badgePulse 2.6s infinite ease-in-out;
+}
+
+/* subtle pulse */
+@keyframes badgePulse {
+  0% { transform: scale(1); box-shadow: 0 6px 18px rgba(255,138,0,0.18); }
+  50% { transform: scale(1.12); box-shadow: 0 10px 26px rgba(255,138,0,0.26); }
+  100% { transform: scale(1); box-shadow: 0 6px 18px rgba(255,138,0,0.18); }
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+}
+
+.profile-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}

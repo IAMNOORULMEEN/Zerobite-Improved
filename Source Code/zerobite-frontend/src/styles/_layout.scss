@@ -1,0 +1,29 @@
+// src/styles/_layout.scss
+
+.navbar {
+  @include flex-center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: $primary-color;
+  color: white;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+
+  ul {
+    display: flex;
+    gap: 1.5rem;
+    list-style: none;
+
+    li {
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        color: $accent-color;
+      }
+    }
+  }
+}

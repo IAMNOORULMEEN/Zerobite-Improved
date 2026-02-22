@@ -1,0 +1,46 @@
+/* --- Put all @use at the very top --- */
+@use "./_variables" as *;
+@use "./_navbar" as *;
+@use "./_slider" as *;
+@use "./_responsive" as *;
+@use "./_auth" as *;
+@use "./_sidebar" as *;
+@use "./_home" as *;
+@use "./_sections" as *;
+@use "./_donate" as *;   
+@use "./_available" as *;
+@use "./_admin" as *;
+@use "./_toast" as *;
+@use "./_confirm-modal.scss" as *;
+
+/* --- Now start writing CSS --- */
+html, body, #root {
+  height: 100% !important;
+  min-height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: linear-gradient(160deg, #0f1112 0%, #161718 60%, #0d0d0d 100%) !important;
+  color: #e8e8e8 !important;
+  font-family: "Poppins", sans-serif !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* make everything inherit the unified background */
+*,
+*:before,
+*:after {
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* remove full-background on these selectors if later CSS sets them */
+.hero,
+.section,
+.page-wrapper,
+.app-shell,
+.container,
+.main {
+  background: transparent !important;
+}

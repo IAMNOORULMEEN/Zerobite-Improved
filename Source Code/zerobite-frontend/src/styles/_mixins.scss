@@ -1,0 +1,16 @@
+// src/styles/_mixins.scss
+
+// For flex centering
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// For responsive fonts
+@mixin responsive-text($size) {
+  font-size: $size;
+  @media (max-width: 768px) {
+    font-size: calc($size - 2px);
+  }
+}
