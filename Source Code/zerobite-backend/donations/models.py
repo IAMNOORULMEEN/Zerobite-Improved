@@ -1,7 +1,9 @@
 from decimal import Decimal
+import secrets
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+
 
 # Use DecimalField for coordinates to keep consistent precision with Donation model
 COORD_MAX_DIGITS = 9
@@ -53,6 +55,16 @@ class Donation(models.Model):
     is_claimed = models.BooleanField(default=False)
     is_expired = models.BooleanField(default=False)
 
+    # NEW — who claimed this donation, and when
+    claimed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="claimed_donations",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    claimed_at = models.DateTimeField(null=True, blank=True)
+    
     class Meta:
         ordering = ['-created_at']
         indexes = [
@@ -112,6 +124,17 @@ class Order(models.Model):
         null=True,
         blank=True,
     )
+        # NEW — pickup verification (feature 4)
+    pickup_code = models.CharField(max_length=6, unique=True, null=True, blank=True)
+    code_verified_at = models.DateTimeField(null=True, blank=True)
+    code_attempts = models.PositiveIntegerField(default=0)
+
+    STATUS_CHOICES = (
+        ('pending', 'Awaiting pickup'),
+        ('picked_up', 'Picked up'),
+        ('cancelled', 'Cancelled'),
+    )
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -128,6 +151,15 @@ class Order(models.Model):
             return f"Order #{self.pk} by {self.user.username} for {self.donation.name}"
         except Exception:
             return f"Order #{self.pk}"
+
+
+def generate_pickup_code():
+    """Generate a unique 6-digit code. Retries on collision."""
+    for _ in range(20):
+        code = f"{secrets.randbelow(1000000):06d}"
+        if not Order.objects.filter(pickup_code=code).exists():
+            return code
+    raise RuntimeError("Could not generate a unique pickup code after 20 attempts.")
 
     # Optional: If you want the DB to auto-mark donation as claimed at save time
     # you can uncomment and use this post_save signal, but note we've already

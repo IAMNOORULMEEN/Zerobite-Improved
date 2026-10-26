@@ -57,3 +57,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email", "role", "avatar", "is_staff", "is_superuser"]
         read_only_fields = ["is_staff", "is_superuser"]
     
+from .models import Notification
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'title', 'message', 'is_read', 'created_at']

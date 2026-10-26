@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = 'django-insecure-nu%10gu-o-=t6c!jg(ho7w3h6fy@c)#n*bwo9n^(^ef6@f=v(*'
 DEBUG = True
-ALLOWED_HOSTS = []  # add hostnames in production
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # add hostnames in production
 
 # Custom user model
 AUTH_USER_MODEL = 'users.User'
@@ -83,12 +83,13 @@ REST_FRAMEWORK = {
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database — MySQL (make sure mysqlclient is installed)
+# Database — MariaDB (make sure mysqlclient is installed)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'zerobite_db',
-        'USER': 'root',
-        'PASSWORD': '12345',
+        'USER': 'zerobite',
+        'PASSWORD': 'zerobite_pass',
         'HOST': 'localhost',
         'PORT': '3306',
     }

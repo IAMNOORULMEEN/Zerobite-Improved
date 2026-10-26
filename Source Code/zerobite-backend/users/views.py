@@ -108,3 +108,27 @@ def reset_password_direct(request):
     user.set_password(new_password)
     user.save()
     return Response({"status": "OK", "message": "Password updated successfully"}, status=200)
+
+from .models import Notification
+from .serializers import NotificationSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_notifications(request):
+    notifications = Notification.objects.filter(user=request.user)[:20]
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, pk):
+    try:
+        notif = Notification.objects.get(pk=pk, user=request.user)
+        notif.is_read = True
+        notif.save()
+        return Response({"status": "read"})
+    except Notification.DoesNotExist:
+        return Response({"error": "Not found"}, status=404)

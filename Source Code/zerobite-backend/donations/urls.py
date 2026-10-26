@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     DonationListCreateAPIView, DonationRetrieveDestroyAPIView,
-    DonationClaimAPIView, DonationUserStatsAPIView, OrderListCreateView
+    DonationClaimAPIView, DonationUserStatsAPIView, OrderListCreateView,
+    OrderVerifyCodeView,RewardsAPIView,AdminStatsAPIView,
 )
 
 urlpatterns = [
@@ -11,5 +12,7 @@ urlpatterns = [
     path('donations/user_stats/', DonationUserStatsAPIView.as_view(), name='donation-user-stats'),
     path("donations/", DonationListCreateAPIView.as_view(), name="donations-list"),
     path("orders/", OrderListCreateView.as_view(), name="orders-list-create"),
-
+    path("orders/<int:pk>/verify-code/", OrderVerifyCodeView.as_view(), name="order-verify-code"),
+    path("rewards/", RewardsAPIView.as_view(), name="rewards"),
+    path("admin/stats/", AdminStatsAPIView.as_view(), name="admin-stats"),
 ]

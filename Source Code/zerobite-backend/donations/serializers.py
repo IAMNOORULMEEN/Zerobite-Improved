@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
-from .models import Donation, DonationImage, Order
+from .models import Donation, DonationImage, Order, generate_pickup_code
 
 User = get_user_model()
 
@@ -39,6 +39,7 @@ class DonationSerializer(serializers.ModelSerializer):
     images = DonationImageSerializer(many=True, read_only=True)
     remaining_seconds = serializers.SerializerMethodField(read_only=True)
     thumbnail = serializers.SerializerMethodField(read_only=True)
+    distance_km = serializers.FloatField(read_only=True)
 
     class Meta:
         model = Donation
@@ -47,10 +48,13 @@ class DonationSerializer(serializers.ModelSerializer):
             "expiry_time", "remaining_seconds", "location", "latitude", "longitude",
             "donor", "donor_username", "donor_avatar", "donor_role",
             "images", "thumbnail", "created_at", "is_claimed", "is_expired",
+            "claimed_by", "claimed_by_username", "claimed_at","order_id", 
+            "distance_km",
         ]
         read_only_fields = [
             "donor", "created_at", "donor_username", "donor_avatar",
             "donor_role", "remaining_seconds", "is_expired", "thumbnail",
+            "claimed_by", "claimed_by_username", "claimed_at", "distance_km",
         ]
 
     def get_remaining_seconds(self, obj):
@@ -83,6 +87,20 @@ class DonationSerializer(serializers.ModelSerializer):
             return default
         return "/static/default_donation.jpg"
 
+    claimed_by_username = serializers.SerializerMethodField(read_only=True)
+
+    def get_claimed_by_username(self, obj):
+        if not getattr(obj, "claimed_by", None):
+            return None
+        return getattr(obj.claimed_by, "username", None)
+    
+    order_id = serializers.SerializerMethodField(read_only=True)
+
+    def get_order_id(self, obj):
+        # obj.orders uses the related_name from the Order model
+        order = obj.orders.first()
+        return order.id if order else None
+        
     def create(self, validated_data):
         request = self.context.get("request")
         validated_data.pop("donor", None)
@@ -133,14 +151,27 @@ class OrderSerializer(serializers.ModelSerializer):
     """
     donation_details = DonationSerializer(source="donation", read_only=True)
 
+    pickup_code = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Order
-        fields = ["id", "donation", "donation_details", "user", "confirmation_note", "latitude", "longitude", "created_at"]
-        read_only_fields = ["id", "user", "donation_details", "created_at"]
+        fields = ["id", "donation", "donation_details", "user", "confirmation_note", "latitude", "longitude", "created_at", "pickup_code", "code_verified_at", "status"]
+        read_only_fields = ["id", "user", "donation_details", "created_at","pickup_code", "code_verified_at", "status"]
 
     confirmation_note = serializers.CharField(required=True, allow_blank=False)
     latitude = serializers.FloatField(required=False, allow_null=True)
     longitude = serializers.FloatField(required=False, allow_null=True)
+    def get_pickup_code(self, obj):
+        """
+        Only the claiming NGO sees the code, and only while the pickup
+        is still pending. The donor (and everyone else) sees null.
+        """
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+        if obj.user_id == request.user.id and obj.status == "pending":
+            return obj.pickup_code
+        return None
 
     def validate(self, attrs):
         """
@@ -214,16 +245,22 @@ class OrderSerializer(serializers.ModelSerializer):
         # If view provided user in save(), serializer.save(user=...), that will be used instead.
         # Here we create directly if necessary.
         if user and user.is_authenticated:
-            order = Order.objects.create(user=user, **validated_data)
+            order = Order.objects.create(
+                user=user,
+                pickup_code=generate_pickup_code(),   # NEW — feature 4
+                **validated_data,
+            )
         else:
-            order = Order.objects.create(**validated_data)
-
+            order = Order.objects.create(
+                pickup_code=generate_pickup_code(),   # NEW — feature 4
+                **validated_data,
+            )
         # Mark donation claimed — best practice: view does it in atomic transaction.
-        try:
-            donation.is_claimed = True
-            donation.save(update_fields=["is_claimed"])
-        except Exception:
-            pass
+        # try:
+        #     donation.is_claimed = True
+        #     donation.save(update_fields=["is_claimed"])
+        # except Exception:
+        #     pass
 
         return order
 
