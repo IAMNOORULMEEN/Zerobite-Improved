@@ -115,12 +115,28 @@ export default function DonationsList({ className = "" }) {
   const [placing, setPlacing] = useState({}); // { [donationId]: true/false }
   const [msg, setMsg] = useState(null);
 
-  useEffect(() => {
+    useEffect(() => {
     let mounted = true;
     const fetchDonations = async () => {
       setLoading(true);
       try {
-        const url = `${API_BASE.replace(/\/$/, "")}/donations/`;
+        // 1. Get user's location
+        let lat = "";
+        let lng = "";
+        if (navigator.geolocation) {
+          try {
+            const pos = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+            });
+            lat = pos.coords.latitude;
+            lng = pos.coords.longitude;
+          } catch (err) {
+            console.log("Location access denied or timed out. Showing default order.");
+          }
+        }
+
+        // 2. Fetch donations with location
+        const url = `${API_BASE.replace(/\/$/, "")}/donations/?lat=${lat}&lng=${lng}`;
         const res = await authFetch(url);
         if (!res.ok) throw new Error(`Could not fetch donations (${res.status})`);
         const data = await res.json();
@@ -230,8 +246,16 @@ export default function DonationsList({ className = "" }) {
                 />
               </div>
 
-              <div className="donation-body sketch-body">
-                <h3 className="donation-title">{d.name}</h3>
+                            <div className="donation-body sketch-body">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <h3 className="donation-title" style={{ margin: 0 }}>{d.name}</h3>
+                  {/* NEW: Show distance if available */}
+                  {d.distance_km && d.distance_km < 9999 && (
+                    <span style={{ fontSize: 12, background: '#e0f7fa', color: '#006064', padding: '2px 6px', borderRadius: 4, fontWeight: 'bold' }}>
+                      📍 {d.distance_km} km away
+                    </span>
+                  )}
+                </div>
                 <div className="donation-desc-line">
                   {d.description || "No description"}
                 </div>

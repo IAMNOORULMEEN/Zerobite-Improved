@@ -1,59 +1,92 @@
 // src/pages/DonationHistory.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import authFetch from "../utils/authFetch";
+import ConfirmPickupModal from "../components/ConfirmPickupModal";
 
 export default function DonationHistory() {
-  const [orders, setOrders] = useState([]);
+  const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
+  const [pickupOrderId, setPickupOrderId] = useState(null);
 
-  const loadOrders = useCallback(async () => {
+  const loadDonations = useCallback(async () => {
     setLoading(true);
     setErr(null);
     try {
-      const res = await authFetch("http://127.0.0.1:8000/api/orders/", { method: "GET" });
+      // Fetch the donor's own posted donations
+      const res = await authFetch("donations/user_stats/", { method: "GET" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setOrders(Array.isArray(data) ? data : []);
+      // The API returns { posts: [...] }
+      setDonations(data.posts || []);
     } catch (e) {
-      console.error("Failed loading orders", e);
-      setErr(e.message || "Failed loading orders");
+      console.error("Failed loading donations", e);
+      setErr(e.message || "Failed loading donations");
     } finally { 
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    loadOrders();
-    const onOrderPlaced = () => loadOrders();
-    window.addEventListener("zerobite_order_placed", onOrderPlaced);
-    return () => window.removeEventListener("zerobite_order_placed", onOrderPlaced);
-  }, [loadOrders]);
+    loadDonations();
+  }, [loadDonations]);
 
-  if (loading) return <div className="container"><p>Loading your confirmed orders...</p></div>;
+  if (loading) return <div className="container"><p>Loading your donations...</p></div>;
   if (err) return <div className="container"><p style={{ color: "red" }}>{err}</p></div>;
-  if (!orders.length) return <div className="container"><p>No confirmed orders yet.</p></div>;
+  if (!donations.length) return <div className="container"><p>You haven't posted any donations yet.</p></div>;
 
   return (
     <div className="container">
-      <h1>Donation History</h1>
-      <button onClick={loadOrders} style={{ marginBottom: 12 }}>Refresh</button>
-      <ul className="list">
-        {orders.map((o) => {
-          const donation = o.donation_details || o.donation || {};
-          const title = donation.name || donation.title || `Donation #${o.donation || "?"}`;
-          return (
-            <li key={o.id} className="card" style={{ marginBottom: 12, padding: 12 }}>
-              <strong>{title}</strong>
-              <p>{o.confirmation_note}</p>
-              <small style={{ color: "#666" }}>
-                📍 {o.latitude != null ? Number(o.latitude).toFixed(3) : "—"}, {o.longitude != null ? Number(o.longitude).toFixed(3) : "—"} <br />
-                ⏰ {o.created_at ? new Date(o.created_at).toLocaleString() : "—"}
-              </small>
-            </li>
-          );
-        })}
+      <h1>My Posted Donations</h1>
+      <button onClick={loadDonations} style={{ marginBottom: 12, padding: '8px 16px', cursor: 'pointer' }}>
+        Refresh
+      </button>
+      <ul className="list" style={{ listStyle: 'none', padding: 0 }}>
+        {donations.map((d) => (
+          <li key={d.id} className="card" style={{ marginBottom: 16, padding: 16, border: '1px solid #ddd', borderRadius: 8, background: '#fff' }}>
+            <strong style={{ fontSize: 18 }}>{d.name}</strong>
+            <p style={{ margin: '8px 0', color: '#555' }}>{d.description}</p>
+            <small style={{ color: "#888", display: 'block', marginBottom: 12 }}>
+              📍 {d.location} <br />
+              ⏰ Expires: {d.expiry_time ? new Date(d.expiry_time).toLocaleString() : "—"}
+            </small>
+
+            {d.is_expired ? (
+              <div style={{ background: '#fce8e6', color: '#c5221f', padding: '10px', borderRadius: 6, fontWeight: 700, fontSize: 14 }}>
+                ❌ Expired
+              </div>
+            ) : d.is_claimed ? (
+              <div>
+                <div style={{ background: '#e6f4ea', color: '#1e8e3e', padding: '10px', borderRadius: 6, fontWeight: 700, fontSize: 14, marginBottom: 8 }}>
+                  ✅ Claimed by {d.claimed_by_username || "an NGO"}
+                </div>
+                {d.order_id && (
+                  <button
+                    onClick={() => setPickupOrderId(d.order_id)}
+                    style={{
+                      padding: "10px 20px", background: "#ffb300", border: "none",
+                      borderRadius: 6, fontWeight: 700, cursor: "pointer"
+                    }}
+                  >
+                    Confirm Pickup
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div style={{ color: '#666', fontWeight: 600 }}>
+                ⏳ Available (Not yet claimed)
+              </div>
+            )}
+          </li>
+        ))}
       </ul>
+
+      <ConfirmPickupModal
+        open={!!pickupOrderId}
+        order={pickupOrderId}
+        onClose={() => setPickupOrderId(null)}
+        onSuccess={() => loadDonations()}
+      />
     </div>
   );
 }

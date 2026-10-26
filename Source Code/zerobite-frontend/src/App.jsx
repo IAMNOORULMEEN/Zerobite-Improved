@@ -1,4 +1,5 @@
 // src/App.jsx
+import AdminDashboard from "./pages/AdminDashboard";
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { LoadScript } from "@react-google-maps/api";
@@ -53,6 +54,7 @@ export default function App() {
 
             {/* Admin */}
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/login" element={<AdminLogin />} />
 
             {/* Profile / user routes */}
@@ -68,7 +70,6 @@ export default function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/help" element={<Help />} />
             <Route path="/orders" element={<OrderHistory />} />
-
 
             {/* Donations system */}
             <Route
