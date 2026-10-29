@@ -12,6 +12,7 @@ import {
   Gift,
   ClipboardList,
   HelpCircle,
+  Utensils, // <-- NEW: Added icon for food
 } from "lucide-react";
 import "../styles/_sidebar.scss";
 
@@ -38,10 +39,16 @@ const Sidebar = ({ isOpen, onClose }) => {
   const unreadCount = user?.unreadNotifications || 0;
 
   // menu definitions
-  const menuItems = [
-    { to: "/", label: "Dashboard", Icon: ClipboardList },
-    { to: "/my-offers", label: "My Offers", Icon: Gift },
-    { to: "/donations", label: "Donation History", Icon: MapPin },
+      const menuItems = [
+    { to: (user?.is_staff || user?.is_superuser) ? "/admin/dashboard" : "/", label: "Dashboard", Icon: ClipboardList },
+    { to: "/available", label: "Available Food", Icon: Utensils },
+    { to: "/orders", label: "My Orders & Codes", Icon: ClipboardList }, 
+    { to: "/donations", label: "My Posted Donations", Icon: MapPin },
+    
+    // --- ADD THIS LINE RIGHT HERE ---
+    { to: "/reward", label: "Rewards & Impact", Icon: Gift },
+    // --------------------------------
+
     { to: "/nearby-requests", label: "Nearby Requests", Icon: MapPin },
     { to: "/notifications", label: "Notifications", Icon: Bell, badge: unreadCount },
     { to: "/edit-profile", label: "Edit Profile", Icon: UserCog },
